@@ -13,6 +13,7 @@ from src.nightscout_client import (
     get_entries_by_range,
     get_treatments,
     get_treatments_by_range,
+    get_infusion_change_by_range,
     add_treatment,
     delete_treatment,
     get_profiles,
@@ -247,7 +248,7 @@ def get_daily_glucose_stats(date: str) -> dict:
 @mcp.tool()
 def get_recent_treatments(count: int = 20) -> list[dict]:
     """Get recent treatments (insulin boluses, carb entries,
-    temp basals, notes, etc.).
+    temp basals, notes, eventType, etc.).
 
     Args:
         count: Number of treatments to return (default 20)
@@ -267,6 +268,20 @@ def get_treatments_by_date(date_from: str, date_to: str, count: int = 500) -> li
         count: Maximum number of treatments (default 500)
     """
     return get_treatments_by_range(date_from, date_to, count)
+
+
+@mcp.tool()
+def get_infusion_change_by_date(date_from: str, date_to: str, count: int = 500) -> list[dict]:
+    """Get infusion change events for a specific date range.
+
+    Args:
+        date_from: Start date in ISO format
+            (e.g. '2024-01-15T00:00:00Z')
+        date_to: End date in ISO format
+            (e.g. '2024-01-15T23:59:59Z')
+        count: Maximum number of treatments (default 500)
+    """
+    return get_infusion_change_by_range(date_from, date_to, count)
 
 
 @mcp.tool()

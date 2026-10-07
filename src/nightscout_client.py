@@ -120,14 +120,39 @@ def get_treatments(count: int = 10, find: Optional[dict] = None) -> list:
     return _get("treatments.json", params)
 
 
-def get_treatments_by_range(date_from: str, date_to: str, count: int = 1000) -> list:
-    params = {
-        "find[created_at][$gte]": date_from,
-        "find[created_at][$lte]": date_to,
-        "count": str(count),
-    }
-    return _get("treatments.json", params)
+def get_treatments_by_range(date_from: str, date_to: str, count: int = 1000, find: Optional[dict] = None) -> list:
+    params = {}
+    if find:
+        params.update(find)
+    params.update(
+        {
+        "created_at[$gte]": date_from,
+        "created_at[$lte]": date_to,
+        }
+    )
+    return get_treatments(count=count, find=find)
 
+def get_infusion_change_by_range(date_from: str, date_to: str, count: int = 1000) -> list:
+    """
+    Retrieves specifically site change events (infusion set changes) 
+    within a date range.
+    
+    Returns a list of treatment entries that match the site-change event type.
+    """
+    # We filter by eventType 'site-change' via the 'find' parameter
+    # Note: Depending on your specific Nightscout setup/app, 
+    # the eventType might be 'sitechange' or 'site-change'. 
+    # 'site-change' is the standard for most automated uploaders.
+    filters = {
+        "eventType": "Site Change"
+    }
+    
+    return get_treatments_by_range(
+        date_from=date_from,
+        date_to=date_to,
+        count=count,
+        find=filters
+    )
 
 def add_treatment(treatment: dict) -> any:
     return _post("treatments", [treatment])
@@ -342,4 +367,3 @@ def get_aggregated_glucose_stats(date_from: str, date_to: str) -> dict:
             "weekday_avgs": weekday_avgs,
         }
     }
-
