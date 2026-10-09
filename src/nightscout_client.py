@@ -113,10 +113,13 @@ def get_entries_by_range(date_from: str, date_to: str, count: int = 1000) -> lis
 # ---------------------------------------------------------------------------
 
 def get_treatments(count: int = 10, find: Optional[dict] = None) -> list:
-    params = {"count": str(count)}
+    params = {
+        "count": str(count),
+
+        }
     if find:
         for k, v in find.items():
-            params[f"find[{k}]"] = str(v)
+            params[f"find{k}"] = str(v)
     return _get("treatments.json", params)
 
 
@@ -126,11 +129,11 @@ def get_treatments_by_range(date_from: str, date_to: str, count: int = 1000, fin
         params.update(find)
     params.update(
         {
-        "created_at[$gte]": date_from,
-        "created_at[$lte]": date_to,
+        "[created_at][$gte]": date_from,
+        "[created_at][$lte]": date_to,
         }
     )
-    return get_treatments(count=count, find=find)
+    return get_treatments(count=count, find=params)
 
 def get_infusion_change_by_range(date_from: str, date_to: str, count: int = 1000) -> list:
     """
@@ -144,7 +147,7 @@ def get_infusion_change_by_range(date_from: str, date_to: str, count: int = 1000
     # the eventType might be 'sitechange' or 'site-change'. 
     # 'site-change' is the standard for most automated uploaders.
     filters = {
-        "eventType": "Site Change"
+        "[eventType]": "Site Change"
     }
     
     return get_treatments_by_range(
